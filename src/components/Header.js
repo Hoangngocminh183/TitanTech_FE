@@ -48,16 +48,44 @@ function Header() {
   console.log("header count", context)
 
 //search
-  const handleSearch = (e)=>{
-    const { value } = e.target
-    setSearch(value)
+const handleSearch = (e) => {
+  const { value } = e.target;
+  setSearch(value);
 
-    if(value){
-      navigate(`/search?q=${value}`)
-    }else{
-      navigate("/search")
-    }
+  // Gửi tìm kiếm đến API backend
+  if (value) {
+    navigate(`/search?q=${value}`);
+    // Gửi request tìm kiếm đến backend
+    fetch("/api/filter-products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ searchQuery: value }), // Thêm searchQuery vào request
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Xử lý kết quả tìm kiếm ở đây (ví dụ, cập nhật state để hiển thị sản phẩm)
+        console.log(data);
+      });
+  } else {
+    navigate("/search");
+    // Có thể gửi request không có searchQuery nếu không có từ khóa
+    fetch("/api/filter-products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}), // Không gửi searchQuery khi không có từ khóa
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Xử lý kết quả khi không có từ khóa
+        console.log(data);
+      });
   }
+};
+
 
   return (
     <header className="h-16 shadow-md bg-white fixed z-40 w-full">
